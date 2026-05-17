@@ -1,0 +1,13 @@
+BasedOnStyle: Google
+ColumnLimit: 120
+AllowShortFunctionsOnASingleLine: None
+NamespaceIndentation: None
+AccessModifierOffset: -2
+BreakConstructorInitializers: BeforeComma
+ConstructorInitializerIndentWidth: 2
+BreakInheritanceList: BeforeComma
+PackConstructorInitializers: Never
+BreakBeforeBraces: Custom
+BraceWrapping:
+  AfterClass: true
+  AfterFunction: true
