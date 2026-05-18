@@ -40,6 +40,7 @@ static TimerHandle_t render_timer_handle;
 static portMUX_TYPE state_lock = portMUX_INITIALIZER_UNLOCKED;
 static uint8_t current_led_design = 1;
 static SK9822_LedStrip<kLedStripLength> led_strip;
+static bool in_setup_mode = false;
 
 // deep sleep saved
 RTC_DATA_ATTR int saved_led_design = 0;
@@ -48,11 +49,12 @@ RTC_DATA_ATTR int saved_led_design = 0;
 static void LightApplicationState_RenderLeds()
 {
   static OffPattern off_pattern;
-  static SolidRedPattern solid_red_pattern;
+  static SolidColorPattern solid_red_pattern(255, 0, 0);
   static ChasePattern chase_pattern;
   static PulsePattern pulse_pattern;
   static StrobePattern strobe_pattern;
   static TwinklePattern twinkle_pattern;
+  static SolidColorPattern setup_pattern(0, 0, 255);
 
   static const SK9822_Led kFireColors[] = {
       {20, 150, 60, 255},
@@ -62,9 +64,13 @@ static void LightApplicationState_RenderLeds()
 
   uint8_t design = -1;
 
-  portENTER_CRITICAL(&state_lock);
-  design = current_led_design;
-  portEXIT_CRITICAL(&state_lock);
+  if (!in_setup_mode) {
+    portENTER_CRITICAL(&state_lock);
+    design = current_led_design;
+    portEXIT_CRITICAL(&state_lock);
+  } else {
+    design = 7;  // setup pattern
+  }
 
   uint32_t const now = (uint32_t)(esp_timer_get_time() / 1000ULL);
 
@@ -86,6 +92,9 @@ static void LightApplicationState_RenderLeds()
       break;
     case 6:
       led_strip.ApplyDesign(random_pattern, now);
+      break;
+    case 7:
+      led_strip.ApplyDesign(setup_pattern, now);
       break;
     default:
       led_strip.ApplyDesign(solid_red_pattern, now);
@@ -112,6 +121,11 @@ static void enter_deep_sleep(void)
 
   vTaskDelay(pdMS_TO_TICKS(kButtonDebounceMs));
   saved_led_design = current_led_design;
+
+  if (in_setup_mode) {
+    saved_led_design = 1;
+    in_setup_mode = false;
+  }
 
   esp_sleep_enable_gpio_wakeup_on_hp_periph_powerdown(BIT(kGpioButton), ESP_GPIO_WAKEUP_GPIO_LOW);
   esp_deep_sleep_start();
@@ -143,7 +157,9 @@ static void button_task(void* __unused(arg))
   // ESP_LOGI(TAG, "Monitoring button on GPIO %d", kGpioButton);
   // ESP_LOGI(TAG, "Button %s", last_level == 0 ? "pressed" : "released");
 
-  while (1) {
+  // check if released in setup mode
+
+  while (true) {
     ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
     vTaskDelay(pdMS_TO_TICKS(kButtonDebounceMs));
 
@@ -153,7 +169,6 @@ static void button_task(void* __unused(arg))
     }
 
     last_level = level;
-    ESP_LOGI(TAG, "Button %s", level == 0 ? "pressed" : "released");
 
     if (level == 0) {
       pressed_at = xTaskGetTickCount();
@@ -161,14 +176,11 @@ static void button_task(void* __unused(arg))
 
       while (gpio_get_level(kGpioButton) == 0) {
         uint32_t const held_ms = (xTaskGetTickCount() - pressed_at) * portTICK_PERIOD_MS;
-
         if (!long_press_handled && held_ms >= kButtonLongPressMs) {
           long_press_handled = true;
-          ESP_LOGI(TAG, "Long press detected (%" PRIu32 " ms)", held_ms);
           enter_deep_sleep();
         }
-
-        vTaskDelay(pdMS_TO_TICKS(100));
+        vTaskDelay(pdMS_TO_TICKS(50));
       }
 
       continue;
@@ -206,12 +218,31 @@ extern "C" void app_main(void)
       .intr_type = GPIO_INTR_ANYEDGE,
   };
 
-  if (saved_led_design != 0) {
+  // Configure GPIO early so we can read the button on wake
+  ESP_ERROR_CHECK(gpio_config(&button_config));
+
+  // esp_sleep_get_wakeup_causes
+  if (esp_sleep_get_wakeup_cause() == ESP_SLEEP_WAKEUP_GPIO) {
     current_led_design = saved_led_design;
+
+    // Measure how long button is held after waking
+    uint32_t held_ms = 0;
+    while (gpio_get_level(kGpioButton) == 0) {
+      vTaskDelay(pdMS_TO_TICKS(10));
+      held_ms += 10;
+
+      if (held_ms >= kButtonLongPressMs) {
+        ESP_LOGI(TAG, "Long hold on wake (%" PRIu32 " ms) -- special mode", held_ms);
+        // TODO: handle long-hold-on-wake here (setup mode)
+        in_setup_mode = true;  // setup pattern
+        break;
+      }
+    }
+  } else {
+    // Cold boot: start from design 1 (already the default)
   }
 
   ESP_ERROR_CHECK(led_strip.InitSPI(kGpioLedStringClock, kGpioLedStripData));
-  ESP_ERROR_CHECK(gpio_config(&button_config));
   ESP_ERROR_CHECK(gpio_install_isr_service(0));
 
   render_timer_handle =

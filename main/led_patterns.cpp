@@ -58,13 +58,13 @@ void OffPattern::Apply(SK9822_Led* leds, int count, uint32_t now)
   SK9822_Led_Zero(leds, count);
 }
 
-void SolidRedPattern::Apply(SK9822_Led* leds, int count, uint32_t now)
+void SolidColorPattern::Apply(SK9822_Led* leds, int count, uint32_t now)
 {
   for (int i = 0; i < count; i++) {
     leds[i].Brightness = Brightness();
-    leds[i].Red = 255;
-    leds[i].Green = 0;
-    leds[i].Blue = 0;
+    leds[i].Red = red_;
+    leds[i].Green = green_;
+    leds[i].Blue = blue_;
   }
 }
 

@@ -8,12 +8,20 @@ public:
   void Apply(SK9822_Led* leds, int count, uint32_t now) override;
 };
 
-class SolidRedPattern final : public LedDesign
+class SolidColorPattern final : public LedDesign
 {
 public:
+  SolidColorPattern(uint8_t red, uint8_t green, uint8_t blue)
+    : red_(red)
+    , green_(green)
+    , blue_(blue) { }
+
   void Apply(SK9822_Led* leds, int count, uint32_t now) override;
 
 private:
+  uint8_t red_;
+  uint8_t green_;
+  uint8_t blue_;
 };
 
 class ChasePattern final : public LedDesign
