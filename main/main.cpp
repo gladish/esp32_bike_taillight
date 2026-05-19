@@ -3,28 +3,22 @@
  *
  * SPDX-License-Identifier: CC0-1.0
  */
-#include <assert.h>
-#include <inttypes.h>
-#include <stdbool.h>
-#include <stdio.h>
+#include <sdkconfig.h>
 
-#include "driver/gpio.h"
-#include "esp_log.h"
-#include "esp_sleep.h"
-#include "esp_system.h"
-#include "esp_timer.h"
-#include "freertos/FreeRTOS.h"
-#include "freertos/task.h"
-#include "freertos/timers.h"
-#include "led_patterns.h"
-#include "sdkconfig.h"
-#include "sk9822_leds.hpp"
+#include <esp_log.h>
+#include <esp_sleep.h>
+
+#include <button_gpio.h>
+#include <iot_button.h>
+#include <led_strip_spi.h>
 
 // constants
 static constexpr uint8_t kLedModeCount = 6;
 static constexpr uint8_t kLedStripLength = 8;
 static constexpr uint32_t kRenderTimerPeriodMs = 33;
+static constexpr uint32_t kStartupFlashMs = 250;
 static constexpr uint32_t kButtonDebounceMs = 30;
+static constexpr uint32_t kButtonShortPressMs = 180;
 static constexpr uint32_t kButtonLongPressMs = 1500;
 static constexpr gpio_num_t kGpioButton = GPIO_NUM_2;
 static constexpr gpio_num_t kGpioLedStringClock = GPIO_NUM_8;
@@ -34,229 +28,199 @@ static constexpr uint32_t kRenderTaskStackSize = 3072;
 
 // globals
 static const char* TAG = "main";
-static TaskHandle_t button_task_handle;
 static TaskHandle_t render_task_handle;
-static TimerHandle_t render_timer_handle;
 static portMUX_TYPE state_lock = portMUX_INITIALIZER_UNLOCKED;
-static uint8_t current_led_design = 1;
-static SK9822_LedStrip<kLedStripLength> led_strip;
+static uint8_t current_led_pattern = 1;
 static bool in_setup_mode = false;
 
 // deep sleep saved
-RTC_DATA_ATTR int saved_led_design = 0;
+RTC_DATA_ATTR int saved_led_pattern = 0;
 
-
-static void LightApplicationState_RenderLeds()
+static void render_solid_color_pattern(led_strip_spi_t* leds, uint8_t n, rgb_t color)
 {
-  static OffPattern off_pattern;
-  static SolidColorPattern solid_red_pattern(255, 0, 0);
-  static ChasePattern chase_pattern;
-  static PulsePattern pulse_pattern;
-  static StrobePattern strobe_pattern;
-  static TwinklePattern twinkle_pattern;
-  static SolidColorPattern setup_pattern(0, 0, 255);
-
-  static const SK9822_Led kFireColors[] = {
-      {20, 150, 60, 255},
-      {20, 220, 170, 0},
-  };
-  static RandomPattern random_pattern(kFireColors, 2, 100);
-
-  uint8_t design = -1;
-
-  if (!in_setup_mode) {
-    portENTER_CRITICAL(&state_lock);
-    design = current_led_design;
-    portEXIT_CRITICAL(&state_lock);
-  } else {
-    design = 7;  // setup pattern
+  for (int i = 0; i < n; i++) {
+    ESP_ERROR_CHECK( led_strip_spi_set_pixel(leds, i, color) );
   }
+}
 
-  uint32_t const now = (uint32_t)(esp_timer_get_time() / 1000ULL);
+static void render_led_pattern(led_strip_spi_t* leds, uint8_t n, uint8_t pattern)
+{
+  static rgb_t const kColorRed = rgb_t{
+    .r = 255,
+    .g = 0,
+    .b = 0
+  };
 
-  switch (design) {
+  static rgb_t const kColorGreen = rgb_t{
+    .r = 0,
+    .g = 255,
+    .b = 0
+  };
+
+  static rgb_t const kColorBlue = rgb_t{
+    .r = 0,
+    .g = 0,
+    .b = 255
+  };
+
+  static rgb_t const kColorYellow = rgb_t{
+    .r = 255,
+    .g = 255,
+    .b = 0
+  };
+
+  static rgb_t const kColorCyan = rgb_t{
+    .r = 0,
+    .g = 255,
+    .b = 255
+  };
+
+  static rgb_t const kColorMagenta = rgb_t{
+    .r = 255,
+    .g = 0,
+    .b = 255
+  };
+
+  switch (pattern) {
     case 1:
-      led_strip.ApplyDesign(solid_red_pattern, now);
+      render_solid_color_pattern(leds, n, kColorRed);
       break;
     case 2:
-      led_strip.ApplyDesign(chase_pattern, now);
+      render_solid_color_pattern(leds, n, kColorGreen);
       break;
     case 3:
-      led_strip.ApplyDesign(pulse_pattern, now);
+      render_solid_color_pattern(leds, n, kColorBlue);
       break;
     case 4:
-      led_strip.ApplyDesign(strobe_pattern, now);
+      render_solid_color_pattern(leds, n, kColorYellow);
       break;
     case 5:
-      led_strip.ApplyDesign(twinkle_pattern, now);
+      render_solid_color_pattern(leds, n, kColorCyan);
       break;
     case 6:
-      led_strip.ApplyDesign(random_pattern, now);
+      render_solid_color_pattern(leds, n, kColorMagenta);
       break;
     case 7:
-      led_strip.ApplyDesign(setup_pattern, now);
+      render_solid_color_pattern(leds, n, kColorRed);
       break;
     default:
-      led_strip.ApplyDesign(solid_red_pattern, now);
+      render_solid_color_pattern(leds, n, kColorGreen);
       break;
   }
 
-  led_strip.Render();
-}
-
-static void enter_deep_sleep(void)
-{
-  ESP_LOGI(TAG, "Entering deep sleep; press button to wake");
-
-  if (render_timer_handle != NULL) {
-    xTimerStop(render_timer_handle, portMAX_DELAY);
-  }
-
-  led_strip.Clear();
-  led_strip.Render();
-
-  while (gpio_get_level(kGpioButton) == 0) {
-    vTaskDelay(pdMS_TO_TICKS(100));
-  }
-
-  vTaskDelay(pdMS_TO_TICKS(kButtonDebounceMs));
-  saved_led_design = current_led_design;
-
-  if (in_setup_mode) {
-    saved_led_design = 1;
-    in_setup_mode = false;
-  }
-
-  esp_sleep_enable_gpio_wakeup_on_hp_periph_powerdown(BIT(kGpioButton), ESP_GPIO_WAKEUP_GPIO_LOW);
-  esp_deep_sleep_start();
-}
-
-static void render_timer_callback(TimerHandle_t __unused(timer))
-{
-  // notify render task to update LEDs
-  if (render_task_handle != NULL) {
-    xTaskNotifyGive(render_task_handle);
-  }
+  ESP_ERROR_CHECK( led_strip_spi_flush(leds) );
 }
 
 static void render_task(void* __unused(argp))
 {
-  while (1) {
-    ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
-    LightApplicationState_RenderLeds();
-  }
-}
+  uint8_t pattern = -1;
 
-static void button_task(void* __unused(arg))
-{
-  int last_level = gpio_get_level(kGpioButton);
-  TickType_t pressed_at = 0;
+  static spi_device_handle_t device_handler = nullptr;
 
-  bool long_press_handled = false;
+  led_strip_spi_t led_strip = {
+    .buf = NULL,
+    .length = kLedStripLength,
+    .host_device = SPI2_HOST,
+    .mosi_io_num = kGpioLedStripData,
+    .sclk_io_num = kGpioLedStringClock,
+    .max_transfer_sz = LED_STRIP_SPI_BUFFER_SIZE(kLedStripLength),
+    .clock_speed_hz = 1 * 1000 * 1000,
+    .queue_size = 1,
+    .device_handle = device_handler,
+    .dma_chan = LED_STRIP_SPI_DEFAULT_DMA_CHAN,
+    .transaction = {},
+  };
 
-  // ESP_LOGI(TAG, "Monitoring button on GPIO %d", kGpioButton);
-  // ESP_LOGI(TAG, "Button %s", last_level == 0 ? "pressed" : "released");
-
-  // check if released in setup mode
+  ESP_ERROR_CHECK( led_strip_spi_init(&led_strip) );
 
   while (true) {
-    ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
-    vTaskDelay(pdMS_TO_TICKS(kButtonDebounceMs));
-
-    const int level = gpio_get_level(kGpioButton);
-    if (level == last_level) {
-      continue;
-    }
-
-    last_level = level;
-
-    if (level == 0) {
-      pressed_at = xTaskGetTickCount();
-      long_press_handled = false;
-
-      while (gpio_get_level(kGpioButton) == 0) {
-        uint32_t const held_ms = (xTaskGetTickCount() - pressed_at) * portTICK_PERIOD_MS;
-        if (!long_press_handled && held_ms >= kButtonLongPressMs) {
-          long_press_handled = true;
-          enter_deep_sleep();
-        }
-        vTaskDelay(pdMS_TO_TICKS(50));
-      }
-
-      continue;
-    }
-
-    if (long_press_handled) {
-      continue;
-    }
-
     portENTER_CRITICAL(&state_lock);
-    current_led_design = (current_led_design % kLedModeCount) + 1U;
+    pattern = current_led_pattern;
     portEXIT_CRITICAL(&state_lock);
 
-    ESP_LOGI(TAG, "Active LED mode: %u", current_led_design);
+    render_led_pattern(&led_strip, kLedStripLength, pattern);
+
+    vTaskDelay(pdMS_TO_TICKS(kRenderTimerPeriodMs));
   }
 }
 
-static void IRAM_ATTR button_isr_handler(void* __unused(arg))
-{
-  BaseType_t task_woken = pdFALSE;
-
-  vTaskNotifyGiveFromISR(button_task_handle, &task_woken);
-  if (task_woken == pdTRUE) {
-    portYIELD_FROM_ISR();
-  }
-}
 
 extern "C" void app_main(void)
 {
-  const gpio_config_t button_config = {
-      .pin_bit_mask = 1ULL << kGpioButton,
-      .mode = GPIO_MODE_INPUT,
-      .pull_up_en = GPIO_PULLUP_ENABLE,
-      .pull_down_en = GPIO_PULLDOWN_DISABLE,
-      .intr_type = GPIO_INTR_ANYEDGE,
+  esp_err_t err;
+
+  ESP_ERROR_CHECK( led_strip_spi_install() );
+
+  const button_config_t button_config = {
+      .long_press_time = kButtonLongPressMs,
+      .short_press_time = kButtonShortPressMs,
+  };
+  const button_gpio_config_t button_gpio_config = {
+      .gpio_num = kGpioButton,
+      .active_level = 0,
+      .enable_power_save = false,
+      .disable_pull = false,
   };
 
-  // Configure GPIO early so we can read the button on wake
-  ESP_ERROR_CHECK(gpio_config(&button_config));
+  button_handle_t button = nullptr;
+  ESP_ERROR_CHECK( iot_button_new_gpio_device(&button_config, &button_gpio_config, &button) );
 
-  // esp_sleep_get_wakeup_causes
-  if (esp_sleep_get_wakeup_cause() == ESP_SLEEP_WAKEUP_GPIO) {
-    current_led_design = saved_led_design;
+  err = iot_button_register_cb(button, BUTTON_SINGLE_CLICK, nullptr, [](void* __unused(button), void* __unused(user_data)) {
+    uint8_t new_pattern = 1;
+    portENTER_CRITICAL(&state_lock);
+    current_led_pattern = (current_led_pattern % kLedModeCount) + 1;
+    new_pattern = current_led_pattern;
+    portEXIT_CRITICAL(&state_lock);
 
-    // Measure how long button is held after waking
-    uint32_t held_ms = 0;
-    while (gpio_get_level(kGpioButton) == 0) {
-      vTaskDelay(pdMS_TO_TICKS(10));
-      held_ms += 10;
+    ESP_LOGI(TAG, "Button single click, current pattern: %u", new_pattern);
+  }, nullptr);
 
-      if (held_ms >= kButtonLongPressMs) {
-        ESP_LOGI(TAG, "Long hold on wake (%" PRIu32 " ms) -- special mode", held_ms);
-        // TODO: handle long-hold-on-wake here (setup mode)
-        in_setup_mode = true;  // setup pattern
-        break;
-      }
-    }
-  } else {
-    // Cold boot: start from design 1 (already the default)
+  if (err != ESP_OK) {
+    ESP_LOGE(TAG, "Failed to register single-click callback: %s", esp_err_to_name(err));
+    return;
   }
 
-  ESP_ERROR_CHECK(led_strip.InitSPI(kGpioLedStringClock, kGpioLedStripData));
-  ESP_ERROR_CHECK(gpio_install_isr_service(0));
+  button_event_args_t button_long_press_event_args = {
+    .long_press = {
+      .press_time = kButtonLongPressMs,
+    },
+  };
 
-  render_timer_handle =
-      xTimerCreate("render_timer", pdMS_TO_TICKS(kRenderTimerPeriodMs), pdTRUE, NULL, render_timer_callback);
-  assert(render_timer_handle != NULL);
+  err = iot_button_register_cb(button, BUTTON_LONG_PRESS_START, &button_long_press_event_args, [](void* __unused(button), void* __unused(user_data)) {
+    ESP_LOGI(TAG, "Button long press");
+    saved_led_pattern = current_led_pattern;
+    esp_sleep_enable_gpio_wakeup_on_hp_periph_powerdown(BIT(kGpioButton), ESP_GPIO_WAKEUP_GPIO_LOW);
+    esp_deep_sleep_start();
+  }, nullptr);
 
-  BaseType_t task_created =
-      xTaskCreate(button_task, "button_task", kButtonTaskStackSize, NULL, 10, &button_task_handle);
-  assert(task_created == pdPASS);
+  if (err != ESP_OK) {
+    ESP_LOGE(TAG, "Failed to register long-press callback: %s", esp_err_to_name(err));
+    return;
+  }
 
-  task_created = xTaskCreate(render_task, "render_task", kRenderTaskStackSize, NULL, 9, &render_task_handle);
-  assert(task_created == pdPASS);
+  button_event_args_t button_multiple_click_event_args = {
+    .multiple_clicks = {
+      .clicks = 3,
+    },
+  };
 
-  ESP_ERROR_CHECK(gpio_isr_handler_add(kGpioButton, button_isr_handler, NULL));
-  BaseType_t timer_started = xTimerStart(render_timer_handle, portMAX_DELAY);
-  assert(timer_started == pdPASS);
+  err = iot_button_register_cb(button, BUTTON_MULTIPLE_CLICK, &button_multiple_click_event_args, [](void* __unused(button), void* __unused(user_data)) {
+    ESP_LOGI(TAG, "Button multiple click");
+  }, nullptr);
+  if (err != ESP_OK) {
+    ESP_LOGE(TAG, "Failed to register multiple-click callback: %s", esp_err_to_name(err));
+    return;
+  }
+
+  auto wakeup_causes = esp_sleep_get_wakeup_causes();
+
+  if (wakeup_causes & BIT(ESP_SLEEP_WAKEUP_GPIO)) {
+    ESP_LOGI(TAG, "Woke up by EXT0 GPIO");
+  }
+
+  auto task_created = xTaskCreate(render_task, "render_task", kRenderTaskStackSize, NULL, 9, &render_task_handle);
+  if (task_created != pdPASS) {
+    ESP_LOGE(TAG, "Failed to create render task");
+    return;
+  }
 }
