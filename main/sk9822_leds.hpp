@@ -63,7 +63,7 @@ public:
   }
 
 protected:
-  uint8_t brightness_ = 18;
+  uint8_t brightness_ = 10;
 };
 
 template <int N>
