@@ -57,8 +57,8 @@ static void LightApplicationState_RenderLeds()
   static SolidColorPattern setup_pattern(0, 0, 255);
 
   static const SK9822_Led kFireColors[] = {
-      {20, 150, 60, 255},
-      {20, 220, 170, 0},
+      {10, 150, 60, 255},
+      {10, 220, 170, 0},
   };
   static RandomPattern random_pattern(kFireColors, 2, 100);
 
@@ -222,7 +222,8 @@ extern "C" void app_main(void)
   ESP_ERROR_CHECK(gpio_config(&button_config));
 
   // esp_sleep_get_wakeup_causes
-  if (esp_sleep_get_wakeup_cause() == ESP_SLEEP_WAKEUP_GPIO) {
+  auto wakeup_causes = esp_sleep_get_wakeup_causes();
+  if (wakeup_causes & BIT(ESP_SLEEP_WAKEUP_GPIO)) {
     current_led_design = saved_led_design;
 
     // Measure how long button is held after waking
