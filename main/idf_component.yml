@@ -1,0 +1,4 @@
+# main/idf_component.yml
+dependencies:
+    espressif/button: "*"
+    esp-idf-lib/led_strip_spi: "1.2.0"
