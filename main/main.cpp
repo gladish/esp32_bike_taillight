@@ -28,7 +28,7 @@ static constexpr uint32_t kButtonDebounceMs = 30;
 static constexpr uint32_t kButtonShortPressMs = 180;
 static constexpr uint32_t kButtonLongPressMs = 1500;
 static constexpr gpio_num_t kGpioButton = GPIO_NUM_2;
-static constexpr gpio_num_t kGpioLedStringClock = GPIO_NUM_8;
+static constexpr gpio_num_t kGpioLedStripClock = GPIO_NUM_8;
 static constexpr gpio_num_t kGpioLedStripData = GPIO_NUM_10;  // mosi
 static constexpr uint32_t kButtonTaskStackSize = 3072;
 static constexpr uint32_t kRenderTaskStackSize = 3072;
@@ -248,6 +248,15 @@ static void enter_deep_sleep_mode(button_handle_t mode_button)
     vTaskDelay(pdMS_TO_TICKS(10));
   }
 
+  // Hold SPI pins low through deep sleep so SK9822 LEDs don't glitch
+  const gpio_num_t spi_pins[] = { kGpioLedStripData, kGpioLedStripClock };
+  for (gpio_num_t pin : spi_pins) {
+    gpio_set_direction(pin, GPIO_MODE_OUTPUT);
+    gpio_set_level(pin, 0);
+    gpio_hold_en(pin);
+  }
+  gpio_deep_sleep_hold_en();
+
   // set interrupt to wake up on button press and go into deep sleep
   esp_sleep_enable_gpio_wakeup_on_hp_periph_powerdown(BIT(kGpioButton), ESP_GPIO_WAKEUP_GPIO_LOW);
   esp_deep_sleep_start();
@@ -264,7 +273,7 @@ static void render_task(void* __unused(argp))
     .length = kLedStripLength,
     .host_device = SPI2_HOST,
     .mosi_io_num = kGpioLedStripData,
-    .sclk_io_num = kGpioLedStringClock,
+    .sclk_io_num = kGpioLedStripClock,
     .max_transfer_sz = LED_STRIP_SPI_BUFFER_SIZE(kLedStripLength),
     .clock_speed_hz = 1 * 1000 * 1000,
     .queue_size = 1,
@@ -324,12 +333,19 @@ extern "C" void app_main(void)
 {
   esp_err_t err;
 
+  const gpio_num_t spi_pins[] = { kGpioLedStripData, kGpioLedStripClock };
+  gpio_deep_sleep_hold_dis();
+  for (gpio_num_t pin : spi_pins) {
+    gpio_hold_dis(pin);
+  }
+
   ESP_ERROR_CHECK( led_strip_spi_install() );
 
   const button_config_t button_config = {
       .long_press_time = kButtonLongPressMs,
       .short_press_time = kButtonShortPressMs,
   };
+
   const button_gpio_config_t button_gpio_config = {
       .gpio_num = kGpioButton,
       .active_level = 0,
