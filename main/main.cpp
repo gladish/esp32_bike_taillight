@@ -19,8 +19,9 @@
 #include <iot_button.h>
 #include <led_strip_spi.h>
 
+#include <type_traits>
+
 // constants
-static constexpr uint8_t kLedModeCount = 6;
 static constexpr uint8_t kLedStripLength = 8;
 static constexpr uint32_t kRenderTimerPeriodMs = 33;
 static constexpr uint32_t kStartupFlashMs = 250;
@@ -33,16 +34,42 @@ static constexpr gpio_num_t kGpioLedStripData = GPIO_NUM_10;  // mosi
 static constexpr uint32_t kButtonTaskStackSize = 3072;
 static constexpr uint32_t kRenderTaskStackSize = 3072;
 
+enum class LedPattern : uint8_t
+{
+  kSolidRed = 1,
+  kChase,
+  kPulse,
+  kStrobe,
+  kTwinkle,
+  kRandom,
+  kLast = kRandom
+};
+
+constexpr LedPattern NextLedPattern(LedPattern pattern)
+{
+  using LedPatternBaseType = std::underlying_type_t<LedPattern>;
+
+  constexpr LedPatternBaseType kMin = static_cast<LedPatternBaseType>(LedPattern::kSolidRed);
+  constexpr LedPatternBaseType kMax = static_cast<LedPatternBaseType>(LedPattern::kRandom);
+
+  LedPatternBaseType value = static_cast<LedPatternBaseType>(pattern);
+  value = (value >= kMax) ? kMin : value + 1;
+
+  return static_cast<LedPattern>(value);
+}
+
+static constexpr uint8_t kLedModeCount = static_cast<uint8_t>(LedPattern::kRandom);
+
 // globals
 static const char* TAG = "main";
 static TaskHandle_t render_task_handle;
 static TaskHandle_t render_stop_waiter_handle;
 static portMUX_TYPE state_lock = portMUX_INITIALIZER_UNLOCKED;
-static uint8_t current_led_pattern = 1;
+static LedPattern current_led_pattern = LedPattern::kSolidRed;
 static bool stop_render_requested = false;
 
 // deep sleep saved
-RTC_DATA_ATTR int saved_led_pattern = 0;
+RTC_DATA_ATTR LedPattern saved_led_pattern = LedPattern::kSolidRed;
 
 typedef struct
 {
@@ -174,7 +201,7 @@ static void render_random_pattern(led_strip_spi_t* leds, uint8_t n, rgb_t const*
   }
 }
 
-static void render_led_pattern(led_strip_spi_t* leds, uint8_t n, uint8_t pattern, animation_clock_t* clock)
+static void render_led_pattern(led_strip_spi_t* leds, uint8_t n, LedPattern pattern, animation_clock_t* clock)
 {
   static rgb_t const kColorRed = rgb_t{
     .r = 255,
@@ -190,26 +217,23 @@ static void render_led_pattern(led_strip_spi_t* leds, uint8_t n, uint8_t pattern
   static uint8_t default_brightness = 40;
 
   switch (pattern) {
-    case 1:
+    case LedPattern::kSolidRed:
       render_solid_color_pattern(leds, n, kColorRed, default_brightness);
       break;
-    case 2:
+    case LedPattern::kChase:
       render_chase_pattern(leds, n, kColorRed, default_brightness, clock);
       break;
-    case 3:
+    case LedPattern::kPulse:
       render_pulse_pattern(leds, n, kColorRed, default_brightness, clock);
       break;
-    case 4:
+    case LedPattern::kStrobe:
       render_strobe_pattern(leds, n, kColorRed, default_brightness, clock);
       break;
-    case 5:
+    case LedPattern::kTwinkle:
       render_twinkle_pattern(leds, n, kColorRed, default_brightness, clock);
       break;
-    case 6:
+    case LedPattern::kRandom:
       render_random_pattern(leds, n, kInstigatorColors, 2, 30, clock);
-      break;
-    case 7:
-      render_solid_color_pattern(leds, n, kColorRed, default_brightness);
       break;
     default:
       render_solid_color_pattern(leds, n, kColorRed, default_brightness);
@@ -264,7 +288,7 @@ static void enter_deep_sleep_mode(button_handle_t mode_button)
 
 static void render_task(void* __unused(argp))
 {
-  uint8_t pattern = 1;
+  LedPattern pattern = LedPattern::kSolidRed;
 
   static spi_device_handle_t device_handler = nullptr;
 
@@ -355,7 +379,7 @@ extern "C" void app_main(void)
     [](void* __unused(button), void* __unused(user_data))
     {
       portENTER_CRITICAL(&state_lock);
-      current_led_pattern = (current_led_pattern % kLedModeCount) + 1;
+      current_led_pattern = NextLedPattern(current_led_pattern);
       portEXIT_CRITICAL(&state_lock);
     }, nullptr));
 
