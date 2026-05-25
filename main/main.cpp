@@ -9,11 +9,6 @@
 #include <esp_random.h>
 #include <esp_sleep.h>
 #include <esp_timer.h>
-#include <nvs_flash.h>
-
-#include <esp_bt.h>
-#include <esp_bt_main.h>
-#include <esp_gatts_api.h>
 
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
@@ -23,6 +18,7 @@
 #include <button_gpio.h>
 #include <iot_button.h>
 
+#include "GattServer.h"
 #include "LedPattern.h"
 
 #include <array>
@@ -50,28 +46,6 @@ static bool in_setup_mode = false;
 
 // deep sleep saved
 RTC_DATA_ATTR LedPattern saved_led_pattern = LedPattern::kSolidRed;
-
-static void InitializeBluetooth()
-{
-  esp_err_t err = nvs_flash_init();
-  if (err == ESP_ERR_NVS_NO_FREE_PAGES || err == ESP_ERR_NVS_NEW_VERSION_FOUND) {
-    ESP_ERROR_CHECK( nvs_flash_erase() );
-    err = nvs_flash_init();
-  }
-  ESP_ERROR_CHECK( err );
-
-  // ESP32-C3 supports BLE only, so release classic BT memory.
-  ESP_ERROR_CHECK( esp_bt_controller_mem_release(ESP_BT_MODE_CLASSIC_BT) );
-
-  esp_bt_controller_config_t bt_cfg = BT_CONTROLLER_INIT_CONFIG_DEFAULT();
-  ESP_ERROR_CHECK( esp_bt_controller_init(&bt_cfg) );
-  ESP_ERROR_CHECK( esp_bt_controller_enable(ESP_BT_MODE_BLE) );
-  ESP_ERROR_CHECK( esp_bluedroid_init() );
-  ESP_ERROR_CHECK( esp_bluedroid_enable() );
-
-  ESP_LOGI(TAG, "Bluetooth BLE stack initialized");
-}
-
 
 static void enter_deep_sleep_mode(button_handle_t mode_button)
 {
@@ -262,7 +236,10 @@ extern "C" void app_main(void)
       portEXIT_CRITICAL(&state_lock);
 
       if (!setup_mode) {
-        InitializeBluetooth();
+        const esp_err_t ret = GattServer::Instance().Initialize();
+        if (ret != ESP_OK) {
+          ESP_LOGE(TAG, "Failed to initialize GattServer: %s", esp_err_to_name(ret));
+        }
       }
     }, nullptr));
 
