@@ -1,7 +1,7 @@
 # bikelight
 ESP32 Bike Rear Light
 
-[Watch the demo](./docs/bike_light_demo_small.mp4)
+[Watch the demo]([./docs/bike_light_demo_small.mp4](https://www.youtube.com/shorts/3QLlCa5cVGc))
 
 <table>
   <tr>
