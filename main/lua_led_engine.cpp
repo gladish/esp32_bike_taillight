@@ -15,10 +15,11 @@ extern "C" {
 #include <lualib.h>
 }
 
+#include <algorithm>
 #include <array>
-#include <cstdlib>
 #include <cstring>
 #include <cstdio>
+#include <new>
 #include <string_view>
 
 
@@ -27,11 +28,11 @@ extern "C" {
 // ---------------------------------------------------------------------------
 
 struct LuaLedEngine {
-  lua_State*   L;
-  char         last_error[256];
-  int          led_count;
-  int          strip_ref;                     // registry ref to the reusable `strip` table
-  LuaLedResult scratch[LUA_LED_MAX_COUNT];     // written by strip.set(), committed on success
+  lua_State*   L = nullptr;
+  char         last_error[256] = {};
+  int          led_count = 0;
+  int          strip_ref = LUA_NOREF;                        // registry ref to the reusable `strip` table
+  std::array<LuaLedResult, LUA_LED_MAX_COUNT> scratch = {};  // written by strip.set(), committed on success
 };
 
 // ---------------------------------------------------------------------------
@@ -114,15 +115,13 @@ static void push_strip_table(lua_State* L, LuaLedEngine* engine) {
 // ---------------------------------------------------------------------------
 
 LuaLedEngine* lua_led_engine_create(void) {
-  LuaLedEngine* engine = (LuaLedEngine*)calloc(1, sizeof(LuaLedEngine));
-  if (!engine) return NULL;
-
-  engine->strip_ref = LUA_NOREF;
+  LuaLedEngine* engine = new (std::nothrow) LuaLedEngine();
+  if (!engine) return nullptr;
 
   engine->L = luaL_newstate();
   if (!engine->L) {
-    free(engine);
-    return NULL;
+    delete engine;
+    return nullptr;
   }
 
   for (const auto& lib : SAFE_LIBS) {
@@ -138,7 +137,7 @@ LuaLedEngine* lua_led_engine_create(void) {
 void lua_led_engine_destroy(LuaLedEngine* engine) {
   if (!engine) return;
   if (engine->L) lua_close(engine->L);  // also frees the strip_ref'd table
-  free(engine);
+  delete engine;
 }
 
 bool lua_led_engine_load(LuaLedEngine* engine, const char* source, int led_count) {
@@ -156,7 +155,7 @@ bool lua_led_engine_load(LuaLedEngine* engine, const char* source, int led_count
   }
 
   engine->led_count = led_count;
-  memset(engine->scratch, 0, sizeof(engine->scratch));
+  engine->scratch.fill({});
 
   lua_State* L = engine->L;
 
@@ -207,8 +206,9 @@ bool lua_led_engine_load(LuaLedEngine* engine, const char* source, int led_count
   return true;
 }
 
-bool lua_led_engine_tick(LuaLedEngine* engine, double now_ms, int led_count, LuaLedResult* out_leds) {
-  if (!engine || !out_leds) return false;
+bool lua_led_engine_tick(LuaLedEngine* engine, double now_ms, std::span<LuaLedResult> out_leds) {
+  if (!engine) return false;
+  int const led_count = static_cast<int>(out_leds.size());
   if (led_count != engine->led_count) {
     snprintf(engine->last_error, sizeof(engine->last_error),
              "tick led_count (%d) doesn't match loaded led_count (%d)",
@@ -229,7 +229,7 @@ bool lua_led_engine_tick(LuaLedEngine* engine, double now_ms, int led_count, Lua
     return false;  // out_leds left untouched -- caller keeps last good frame
   }
 
-  memcpy(out_leds, engine->scratch, sizeof(LuaLedResult) * (size_t)led_count);
+  std::copy_n(engine->scratch.begin(), led_count, out_leds.begin());
   return true;
 }
 

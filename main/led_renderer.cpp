@@ -306,7 +306,7 @@ esp_err_t LuaScriptRenderer::Render(led_strip_spi_t* leds, uint8_t n, int64_t no
   LuaLedResult results[LUA_LED_MAX_COUNT] = {};
   double const now_ms = static_cast<double>(now_us) / 1000.0;
 
-  if (!lua_led_engine_tick(engine_, now_ms, n, results)) {
+  if (!lua_led_engine_tick(engine_, now_ms, std::span<LuaLedResult>(results, n))) {
     ESP_LOGW(TAG, "Lua tick error: %s (holding last frame)", lua_led_engine_last_error(engine_));
     return ESP_OK;  // leave the strip untouched -- caller keeps last good frame
   }
