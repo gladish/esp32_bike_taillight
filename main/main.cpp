@@ -89,7 +89,7 @@ static void enter_deep_sleep_mode(button_handle_t mode_button)
 static void render_task(void* __unused(argp))
 {
   LedPattern pattern = LedPattern::kSolidRed;
-  PatternContext pattern_context;
+  PatternRenderer renderer = MakePatternRenderer(pattern);
 
   static spi_device_handle_t device_handler = nullptr;
 
@@ -120,15 +120,14 @@ static void render_task(void* __unused(argp))
 
     if (next_pattern != pattern) {
       pattern = next_pattern;
-      pattern_context.reset();
+      renderer = MakePatternRenderer(pattern);
     }
 
     if (should_stop) {
       break;
     }
 
-    pattern_context.clock.now_us = esp_timer_get_time();
-    RenderLedPattern(&led_strip, kLedStripLength, pattern, &pattern_context);
+    RenderLedPattern(renderer, &led_strip, kLedStripLength, esp_timer_get_time());
 
     // Sleep until next frame, but allow immediate wake-up when stop is requested.
     ulTaskNotifyTake(pdTRUE, pdMS_TO_TICKS(kRenderTimerPeriodMs));
@@ -155,8 +154,6 @@ static void render_task(void* __unused(argp))
 
 extern "C" void app_main(void)
 {
-  PatternDefinition::InitializePatternConfigs();
-
   gpio_deep_sleep_hold_dis();
 
   ESP_ERROR_CHECK( gpio_hold_dis(kGpioLedStripData) );

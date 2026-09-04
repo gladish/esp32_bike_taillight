@@ -1,5 +1,9 @@
 {
   "C_Cpp.intelliSenseEngine": "default",
+  "cmake.configureOnOpen": false,
+  "cmake.configureOnEdit": false,
+  "cmake.automaticReconfigure": false,
+  "cmake.options.statusBarVisibility": "hidden",
   "idf.extensionActivationMode": "always",
   "idf.openOcdConfigs": [
     "board/esp32c3-builtin.cfg"
@@ -14,6 +18,6 @@
     "--query-driver=**",
     "--compile-commands-dir=c:\\Users\\jacob\\Work\\hello_world\\build"
   ],
-  "idf.portWin": "COM5",
+  "idf.portWin": "COM3",
   "idf.flashType": "UART"
 }
