@@ -1,4 +1,4 @@
 idf_component_register(
-  SRCS "LedPattern.cpp" "main.cpp"
+  SRCS "LedPattern.cpp" "lua_led_engine.c" "main.cpp"
   PRIV_REQUIRES "spi_flash" "esp_driver_gpio" "esp_driver_spi" "esp_timer"
   INCLUDE_DIRS "")

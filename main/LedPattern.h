@@ -151,6 +151,45 @@ private:
 };
 
 
+// Opaque; the full definition and the Lua C API live in lua_led_engine.h,
+// included only by LedPattern.cpp -- nothing that just uses LuaScriptRenderer
+// through this header needs to see the Lua VM's guts.
+struct LuaLedEngine;
+
+class LuaScriptRenderer
+{
+public:
+  LuaScriptRenderer();
+  ~LuaScriptRenderer();
+
+  // Owns a lua_State* by pointer, so it moves (transfer ownership) instead
+  // of copying. These have to be spelled out explicitly: declaring the
+  // destructor above suppresses the compiler-generated implicit move ctor/
+  // assignment, and without an explicit noexcept move, std::variant would
+  // fall back to a more defensive (and non-trivial) assignment strategy
+  // when this renderer becomes active or inactive.
+  LuaScriptRenderer(LuaScriptRenderer&& other) noexcept;
+  LuaScriptRenderer& operator=(LuaScriptRenderer&& other) noexcept;
+  LuaScriptRenderer(const LuaScriptRenderer&) = delete;
+  LuaScriptRenderer& operator=(const LuaScriptRenderer&) = delete;
+
+  // Compiles and loads a new script, replacing whatever was previously
+  // loaded. Returns false on a compile or setup error -- call LastError()
+  // for details. A failed load leaves nothing loaded: Render() then leaves
+  // the strip completely untouched every frame until a script loads
+  // successfully.
+  bool LoadScript(const char* source, uint8_t led_count);
+
+  esp_err_t Render(led_strip_spi_t* leds, uint8_t n, int64_t now_us);
+
+  const char* LastError() const;
+
+private:
+  LuaLedEngine* engine_ = nullptr;
+  bool          loaded_ = false;
+};
+
+
 using PatternRenderer = std::variant<
   SolidColorRenderer,
   ChaseRenderer,
@@ -158,6 +197,10 @@ using PatternRenderer = std::variant<
   StrobeRenderer,
   TwinkleRenderer,
   RandomRenderer>;
+
+// LuaScriptRenderer is not in the variant above yet, and MakePatternRenderer
+// below doesn't know how to build one -- that wiring (plus the LedPattern
+// enum value it needs) is a deliberately separate follow-up change.
 
 // Builds a freshly-constructed renderer (hardcoded defaults, animation
 // state zeroed) for the given pattern.

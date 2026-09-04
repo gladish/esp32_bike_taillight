@@ -1,4 +1,5 @@
 #include "LedPattern.h"
+#include "lua_led_engine.h"
 
 #include <esp_log.h>
 #include <esp_random.h>
@@ -209,6 +210,90 @@ esp_err_t RandomRenderer::Render(led_strip_spi_t* leds, uint8_t n, int64_t now_u
     }
   }
   return ESP_OK;
+}
+
+// ---------------------------------------------------------------------------
+// LuaScriptRenderer
+// ---------------------------------------------------------------------------
+
+LuaScriptRenderer::LuaScriptRenderer()
+  : engine_(lua_led_engine_create())
+{
+  if (!engine_) {
+    ESP_LOGE(TAG, "Failed to allocate Lua VM");
+  }
+}
+
+LuaScriptRenderer::~LuaScriptRenderer()
+{
+  lua_led_engine_destroy(engine_);
+}
+
+LuaScriptRenderer::LuaScriptRenderer(LuaScriptRenderer&& other) noexcept
+  : engine_(other.engine_), loaded_(other.loaded_)
+{
+  other.engine_ = nullptr;
+  other.loaded_ = false;
+}
+
+LuaScriptRenderer& LuaScriptRenderer::operator=(LuaScriptRenderer&& other) noexcept
+{
+  if (this != &other) {
+    lua_led_engine_destroy(engine_);
+    engine_ = other.engine_;
+    loaded_ = other.loaded_;
+    other.engine_ = nullptr;
+    other.loaded_ = false;
+  }
+  return *this;
+}
+
+bool LuaScriptRenderer::LoadScript(const char* source, uint8_t led_count)
+{
+  if (!engine_) {
+    return false;
+  }
+
+  loaded_ = lua_led_engine_load(engine_, source, led_count);
+  if (!loaded_) {
+    ESP_LOGE(TAG, "Lua script load failed: %s", lua_led_engine_last_error(engine_));
+  }
+  return loaded_;
+}
+
+esp_err_t LuaScriptRenderer::Render(led_strip_spi_t* leds, uint8_t n, int64_t now_us)
+{
+  if (!engine_ || !loaded_) {
+    return ESP_OK;  // nothing loaded -- leave the strip untouched
+  }
+  if (n > LUA_LED_MAX_COUNT) {
+    ESP_LOGE(TAG, "led count %u exceeds LUA_LED_MAX_COUNT (%d)", n, LUA_LED_MAX_COUNT);
+    return ESP_ERR_INVALID_ARG;
+  }
+
+  LuaLedResult results[LUA_LED_MAX_COUNT] = {};
+  double const now_ms = static_cast<double>(now_us) / 1000.0;
+
+  if (!lua_led_engine_tick(engine_, now_ms, n, results)) {
+    ESP_LOGW(TAG, "Lua tick error: %s (holding last frame)", lua_led_engine_last_error(engine_));
+    return ESP_OK;  // leave the strip untouched -- caller keeps last good frame
+  }
+
+  for (int i = 0; i < n; i++) {
+    rgb_t const color = { .r = results[i].r, .g = results[i].g, .b = results[i].b };
+    esp_err_t err = led_strip_spi_set_pixel_brightness(leds, i, color, results[i].brightness);
+    if (err != ESP_OK) {
+      ESP_LOGE(TAG, "Failed to set pixel color: %s", esp_err_to_name(err));
+      return err;
+    }
+  }
+
+  return ESP_OK;
+}
+
+const char* LuaScriptRenderer::LastError() const
+{
+  return engine_ ? lua_led_engine_last_error(engine_) : "no engine";
 }
 
 // ---------------------------------------------------------------------------
