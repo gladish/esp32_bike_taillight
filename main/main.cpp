@@ -18,7 +18,7 @@
 #include <button_gpio.h>
 #include <iot_button.h>
 
-#include "LedPattern.h"
+#include "led_renderer.h"
 
 #include <array>
 
