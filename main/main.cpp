@@ -32,7 +32,12 @@ static constexpr uint32_t kButtonLongPressMs = 1500;
 static constexpr gpio_num_t kGpioButton = GPIO_NUM_2;
 static constexpr gpio_num_t kGpioLedStripClock = GPIO_NUM_8;
 static constexpr gpio_num_t kGpioLedStripData = GPIO_NUM_10;  // mosi
-static constexpr uint32_t kRenderTaskStackSize = 3072;
+// 3072 was plenty when every renderer was a stateless C++ function, but
+// Lua's recursive-descent parser (luaL_loadstring, at LoadScript() time)
+// and its bytecode dispatch (lua_pcall, every tick) both eat real C stack
+// per nesting level -- 3072 is too tight and risks a silent stack overflow
+// (task memory corruption without a clean crash) the moment kPulseLua loads.
+static constexpr uint32_t kRenderTaskStackSize = 8192;
 
 // globals
 static const char* TAG = "main";
@@ -89,7 +94,7 @@ static void enter_deep_sleep_mode(button_handle_t mode_button)
 static void render_task(void* __unused(argp))
 {
   LedPattern pattern = LedPattern::kSolidRed;
-  PatternRenderer renderer = MakePatternRenderer(pattern);
+  PatternRenderer renderer = MakePatternRenderer(pattern, kLedStripLength);
 
   static spi_device_handle_t device_handler = nullptr;
 
@@ -120,7 +125,7 @@ static void render_task(void* __unused(argp))
 
     if (next_pattern != pattern) {
       pattern = next_pattern;
-      renderer = MakePatternRenderer(pattern);
+      renderer = MakePatternRenderer(pattern, kLedStripLength);
     }
 
     if (should_stop) {

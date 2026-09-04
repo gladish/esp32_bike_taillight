@@ -2,3 +2,4 @@
 dependencies:
     espressif/button: "*"
     esp-idf-lib/led_strip_spi: "1.2.0"
+    espressif/lua: "5.5.0"

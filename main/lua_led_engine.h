@@ -16,12 +16,19 @@ extern "C" {
 // NVS-backed storage budget on the microcontroller.
 #define LUA_SCRIPT_MAX_SIZE 4096
 
+// Upper bound for strip.set()'s brightness argument -- matches this
+// board's led_strip_spi driver, which takes a 0-100 input and maps it
+// down to the SK9822's 5-bit field internally (NOT a raw 0-31 value,
+// despite what an earlier version of this comment said).
+#define LUA_LED_MAX_BRIGHTNESS 100
+
 // Result of evaluating one pixel.
 typedef struct {
   uint8_t r;
   uint8_t g;
   uint8_t b;
-  uint8_t brightness;  // 0-31, maps to the SK9822's 5-bit brightness field
+  uint8_t brightness;  // 0-100; passed straight through to the driver,
+                       // which does its own 0-100 -> 5-bit mapping
 } LuaLedResult;
 
 // Opaque engine handle.

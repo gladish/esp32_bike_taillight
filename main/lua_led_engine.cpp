@@ -1,5 +1,5 @@
 /**
- * lua_led_engine.c
+ * lua_led_engine.cpp
  *
  * Sandboxed Lua 5.4 engine for LED animation scripts. This is the
  * host-testable version: same API and sandboxing as what will become
@@ -9,13 +9,18 @@
 
 #include "lua_led_engine.h"
 
+extern "C" {
 #include <lua.h>
 #include <lauxlib.h>
 #include <lualib.h>
+}
 
-#include <stdlib.h>
-#include <string.h>
-#include <stdio.h>
+#include <array>
+#include <cstdlib>
+#include <cstring>
+#include <cstdio>
+#include <string_view>
+
 
 // ---------------------------------------------------------------------------
 // Internal structure
@@ -33,25 +38,30 @@ struct LuaLedEngine {
 // Sandbox: only these libs are opened
 // ---------------------------------------------------------------------------
 
-static const luaL_Reg SAFE_LIBS[] = {
+constexpr std::array<luaL_Reg, 4> SAFE_LIBS = {{
     {"_G",            luaopen_base},
     {LUA_MATHLIBNAME, luaopen_math},
     {LUA_TABLIBNAME,  luaopen_table},
     {LUA_STRLIBNAME,  luaopen_string},
-    {NULL, NULL}
-};
+}};
 
 // Remove dangerous functions from the base library that luaopen_base adds.
 static void sandbox_base(lua_State* L) {
-  static const char* REMOVE[] = {
-      "dofile", "loadfile", "require", "collectgarbage",
-      "rawget", "rawset", "rawequal", "rawlen",
-      "load",   // could load arbitrary bytecode at runtime
-      NULL
+  constexpr std::string_view globals[] = {
+    "dofile",
+    "loadfile",
+    "require",
+    "collectgarbage",
+    "rawget",
+    "rawset",
+    "rawequal",
+    "rawlen",
+    "load"
   };
-  for (int i = 0; REMOVE[i]; i++) {
+
+  for (const auto name : globals) {
     lua_pushnil(L);
-    lua_setglobal(L, REMOVE[i]);
+    lua_setglobal(L, name.data());
   }
 }
 
@@ -70,14 +80,15 @@ static int l_strip_set(lua_State* L) {
 
   if (i < 0 || i >= engine->led_count) {
     return luaL_error(L, "strip.set: index %d out of range (0..%d)",
-                       (int)i, engine->led_count - 1);
+                       (int) i, engine->led_count - 1);
   }
   if (r < 0 || r > 255 || g < 0 || g > 255 || b < 0 || b > 255) {
     return luaL_error(L, "strip.set: r/g/b must be 0-255 (got %d,%d,%d)",
                        (int)r, (int)g, (int)b);
   }
-  if (brightness < 0 || brightness > 31) {
-    return luaL_error(L, "strip.set: brightness must be 0-31 (got %d)", (int)brightness);
+  if (brightness < 0 || brightness > LUA_LED_MAX_BRIGHTNESS) {
+    return luaL_error(L, "strip.set: brightness must be 0-%d (got %d)",
+                       LUA_LED_MAX_BRIGHTNESS, (int)brightness);
   }
 
   engine->scratch[i].r          = (uint8_t)r;
@@ -114,8 +125,8 @@ LuaLedEngine* lua_led_engine_create(void) {
     return NULL;
   }
 
-  for (const luaL_Reg* lib = SAFE_LIBS; lib->func; lib++) {
-    luaL_requiref(engine->L, lib->name, lib->func, 1);
+  for (const auto& lib : SAFE_LIBS) {
+    luaL_requiref(engine->L, lib.name, lib.func, 1);
     lua_pop(engine->L, 1);
   }
   sandbox_base(engine->L);

@@ -24,6 +24,38 @@ constexpr std::array<rgb_t, 2> kInstigatorColors = {
     rgb_t{0, 170, 220},
 };
 
+// Hardcoded test script for LedPattern::kPulseLua -- deliberately just
+// PulseRenderer's own math (2000ms triangle-wave period, brightness peaking
+// at kDefaultBrightness) reimplemented in Lua, with green swapped in for red
+// so the two are trivially distinguishable by eye. If this doesn't visually
+// match kPulse's timing, something in the Lua plumbing is wrong. This goes
+// away once scripts load from NVS instead.
+constexpr const char* kPulseLuaScript = R"lua(
+local led_count
+
+function LedStrip_Setup(n)
+  led_count = n
+end
+
+function LedStrip_Tick(strip, now_ms)
+  local period_ms = 2000.0
+  local cycle_ms = now_ms % period_ms
+  local phase = cycle_ms / period_ms
+
+  local triangle
+  if phase < 0.5 then
+    triangle = phase * 2.0
+  else
+    triangle = 2.0 - phase * 2.0
+  end
+
+  local brightness = math.floor(triangle * 40)
+  for i = 0, led_count - 1 do
+    strip.set(i, 0, 255, 0, brightness)
+  end
+end
+)lua";
+
 }  // namespace
 
 esp_err_t RenderSolidColor(led_strip_spi_t* leds, uint8_t n, rgb_t color, uint8_t brightness)
@@ -300,7 +332,7 @@ const char* LuaScriptRenderer::LastError() const
 // Dispatch
 // ---------------------------------------------------------------------------
 
-PatternRenderer MakePatternRenderer(LedPattern pattern)
+PatternRenderer MakePatternRenderer(LedPattern pattern, uint8_t led_count)
 {
   switch (pattern) {
     case LedPattern::kSolidRed: return SolidColorRenderer{};
@@ -309,6 +341,13 @@ PatternRenderer MakePatternRenderer(LedPattern pattern)
     case LedPattern::kStrobe:   return StrobeRenderer{};
     case LedPattern::kTwinkle:  return TwinkleRenderer{};
     case LedPattern::kRandom:   return RandomRenderer{};
+    case LedPattern::kPulseLua: {
+      LuaScriptRenderer renderer;
+      if (!renderer.LoadScript(kPulseLuaScript, led_count)) {
+        ESP_LOGE(TAG, "kPulseLua: failed to load hardcoded script: %s", renderer.LastError());
+      }
+      return renderer;
+    }
   }
   return SolidColorRenderer{};
 }

@@ -1,5 +1,5 @@
-#ifndef LED_PATTERN_H
-#define LED_PATTERN_H
+#ifndef LED_RENDERER_H
+#define LED_RENDERER_H
 
 #include <led_strip_spi.h>
 
@@ -16,7 +16,8 @@ enum class LedPattern : uint8_t
   kStrobe,
   kTwinkle,
   kRandom,
-  kLast = kRandom
+  kPulseLua,   // same animation as kPulse, but Lua-driven -- see MakePatternRenderer
+  kLast = kPulseLua
 };
 
 
@@ -54,7 +55,7 @@ esp_err_t RenderSolidColor(
 // brightness lived in a separate PatternConfig array indexed in parallel.
 // That made sense while every pattern was a stateless function; it stopped
 // making sense the moment a pattern needs to own a resource with real
-// lifetime (see LuaScriptRenderer, coming in a follow-up change) -- a
+// lifetime (see LuaScriptRenderer below) -- a
 // lua_State* doesn't fit into a shared POD struct.
 //
 // Switching patterns reconstructs the active alternative from scratch (see
@@ -152,7 +153,7 @@ private:
 
 
 // Opaque; the full definition and the Lua C API live in lua_led_engine.h,
-// included only by LedPattern.cpp -- nothing that just uses LuaScriptRenderer
+// included only by led_renderer.cpp -- nothing that just uses LuaScriptRenderer
 // through this header needs to see the Lua VM's guts.
 struct LuaLedEngine;
 
@@ -196,15 +197,17 @@ using PatternRenderer = std::variant<
   PulseRenderer,
   StrobeRenderer,
   TwinkleRenderer,
-  RandomRenderer>;
+  RandomRenderer,
+  LuaScriptRenderer>;
 
-// LuaScriptRenderer is not in the variant above yet, and MakePatternRenderer
-// below doesn't know how to build one -- that wiring (plus the LedPattern
-// enum value it needs) is a deliberately separate follow-up change.
-
-// Builds a freshly-constructed renderer (hardcoded defaults, animation
-// state zeroed) for the given pattern.
-PatternRenderer MakePatternRenderer(LedPattern pattern);
+// Builds a freshly-constructed renderer for the given pattern. kPulseLua
+// loads a hardcoded script (see led_renderer.cpp) into a fresh
+// LuaScriptRenderer -- unlike the other five, it needs led_count up front
+// to do that load, which is why this takes one. If the hardcoded load ever
+// fails, the returned renderer just has nothing loaded (Render() leaves the
+// strip untouched) rather than that being a fatal error -- same fallback
+// behavior LuaScriptRenderer already has for a bad script in general.
+PatternRenderer MakePatternRenderer(LedPattern pattern, uint8_t led_count);
 
 // Draws one frame with whichever renderer is currently held, then flushes
 // the strip. now_us should come from esp_timer_get_time().
