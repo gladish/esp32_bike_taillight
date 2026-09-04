@@ -16,8 +16,8 @@ enum class LedPattern : uint8_t
   kStrobe,
   kTwinkle,
   kRandom,
-  kPulseLua,   // same animation as kPulse, but Lua-driven -- see MakePatternRenderer
-  kLast = kPulseLua
+  kLuaDemo,   // runs kDemoScript (see demo_scripts.cpp) -- see MakePatternRenderer
+  kLast = kLuaDemo
 };
 
 
@@ -200,14 +200,18 @@ using PatternRenderer = std::variant<
   RandomRenderer,
   LuaScriptRenderer>;
 
-// Builds a freshly-constructed renderer for the given pattern. kPulseLua
-// loads a hardcoded script (see led_renderer.cpp) into a fresh
-// LuaScriptRenderer -- unlike the other five, it needs led_count up front
-// to do that load, which is why this takes one. If the hardcoded load ever
-// fails, the returned renderer just has nothing loaded (Render() leaves the
-// strip untouched) rather than that being a fatal error -- same fallback
-// behavior LuaScriptRenderer already has for a bad script in general.
+// Builds a freshly-constructed renderer for the given pattern. kLuaDemo
+// loads kDemoScript (see demo_scripts.cpp) into a fresh LuaScriptRenderer
+// -- unlike the other five, it needs led_count up front to do that load,
+// which is why this takes one. If that load ever fails, the returned
+// renderer just has nothing loaded (Render() leaves the strip untouched)
+// rather than that being a fatal error -- same fallback behavior
+// LuaScriptRenderer already has for a bad script in general.
 PatternRenderer MakePatternRenderer(LedPattern pattern, uint8_t led_count);
+
+// One Lua script per built-in renderer, plus kDemoScript picking which one
+// LedPattern::kLuaDemo actually runs -- see demo_scripts.cpp.
+extern const char* const kDemoScript;
 
 // Draws one frame with whichever renderer is currently held, then flushes
 // the strip. now_us should come from esp_timer_get_time().

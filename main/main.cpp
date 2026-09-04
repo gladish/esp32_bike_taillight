@@ -36,7 +36,7 @@ static constexpr gpio_num_t kGpioLedStripData = GPIO_NUM_10;  // mosi
 // Lua's recursive-descent parser (luaL_loadstring, at LoadScript() time)
 // and its bytecode dispatch (lua_pcall, every tick) both eat real C stack
 // per nesting level -- 3072 is too tight and risks a silent stack overflow
-// (task memory corruption without a clean crash) the moment kPulseLua loads.
+// (task memory corruption without a clean crash) the moment kLuaDemo loads.
 static constexpr uint32_t kRenderTaskStackSize = 8192;
 
 // globals

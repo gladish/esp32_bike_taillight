@@ -1,5 +1,6 @@
 idf_component_register(
     SRCS
+        "demo_scripts.cpp"
         "led_renderer.cpp"
         "lua_led_engine.cpp"
         "main.cpp"
