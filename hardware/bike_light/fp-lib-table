@@ -1,0 +1,4 @@
+(fp_lib_table
+  (version 7)
+  (lib (name "bike_light")(type "KiCad")(uri "${KIPRJMOD}/bike_light.pretty")(options "")(descr "Project-specific footprints for the bike light"))
+)

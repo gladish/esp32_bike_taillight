@@ -1,0 +1,165 @@
+(kicad_symbol_lib
+  (version 20241209)
+  (generator "kicad_symbol_editor")
+  (generator_version "9.0")
+  (symbol "TPS22918DBV"
+    (exclude_from_sim no)
+    (in_bom yes)
+    (on_board yes)
+    (property "Reference" "U"
+      (at -7.62 8.89 0)
+      (effects (font (size 1.27 1.27)) (justify left))
+    )
+    (property "Value" "TPS22918DBV"
+      (at 0 8.89 0)
+      (effects (font (size 1.27 1.27)) (justify left))
+    )
+    (property "Footprint" "Package_TO_SOT_SMD:SOT-23-6"
+      (at 0 -12.7 0)
+      (effects (font (size 1.27 1.27)) (hide yes))
+    )
+    (property "Datasheet" "https://www.ti.com/lit/ds/symlink/tps22918.pdf"
+      (at 0 -15.24 0)
+      (effects (font (size 1.27 1.27)) (hide yes))
+    )
+    (property "Description" "5.5V 2A 52 mOhm load switch with adjustable rise time and quick output discharge, SOT-23-6"
+      (at 0 -17.78 0)
+      (effects (font (size 1.27 1.27)) (hide yes))
+    )
+    (property "ki_keywords" "load switch power TI"
+      (at 0 0 0)
+      (effects (font (size 1.27 1.27)) (hide yes))
+    )
+    (property "ki_fp_filters" "SOT?23*"
+      (at 0 0 0)
+      (effects (font (size 1.27 1.27)) (hide yes))
+    )
+    (symbol "TPS22918DBV_0_1"
+      (rectangle
+        (start -7.62 7.62)
+        (end 7.62 -7.62)
+        (stroke (width 0.254) (type default))
+        (fill (type background))
+      )
+    )
+    (symbol "TPS22918DBV_1_1"
+      (pin power_in line
+        (at -10.16 5.08 0)
+        (length 2.54)
+        (name "VIN" (effects (font (size 1.27 1.27))))
+        (number "1" (effects (font (size 1.27 1.27))))
+      )
+      (pin power_in line
+        (at 0 -10.16 90)
+        (length 2.54)
+        (name "GND" (effects (font (size 1.27 1.27))))
+        (number "2" (effects (font (size 1.27 1.27))))
+      )
+      (pin input line
+        (at -10.16 0 0)
+        (length 2.54)
+        (name "ON" (effects (font (size 1.27 1.27))))
+        (number "3" (effects (font (size 1.27 1.27))))
+      )
+      (pin passive line
+        (at 10.16 -5.08 180)
+        (length 2.54)
+        (name "CT" (effects (font (size 1.27 1.27))))
+        (number "4" (effects (font (size 1.27 1.27))))
+      )
+      (pin passive line
+        (at 10.16 0 180)
+        (length 2.54)
+        (name "QOD" (effects (font (size 1.27 1.27))))
+        (number "5" (effects (font (size 1.27 1.27))))
+      )
+      (pin power_out line
+        (at 10.16 5.08 180)
+        (length 2.54)
+        (name "VOUT" (effects (font (size 1.27 1.27))))
+        (number "6" (effects (font (size 1.27 1.27))))
+      )
+    )
+    (embedded_fonts no)
+  )
+  (symbol "SK9822"
+    (exclude_from_sim no)
+    (in_bom yes)
+    (on_board yes)
+    (property "Reference" "D"
+      (at 1.905 11.43 0)
+      (effects (font (size 1.27 1.27)) (justify left))
+    )
+    (property "Value" "SK9822"
+      (at 1.905 9.525 0)
+      (effects (font (size 1.27 1.27)) (justify left))
+    )
+    (property "Footprint" "LED_SMD:LED_RGB_5050-6"
+      (at 0 -15.24 0)
+      (effects (font (size 1.27 1.27)) (hide yes))
+    )
+    (property "Datasheet" "https://cdn-shop.adafruit.com/product-files/2351/SK9822_datasheet_SHIJI.pdf"
+      (at 0 -17.78 0)
+      (effects (font (size 1.27 1.27)) (hide yes))
+    )
+    (property "Description" "RGB LED with integrated driver, two-wire clock and data interface, 5050 package"
+      (at 0 -20.32 0)
+      (effects (font (size 1.27 1.27)) (hide yes))
+    )
+    (property "ki_keywords" "RGB LED addressable SPI DotStar APA102"
+      (at 0 0 0)
+      (effects (font (size 1.27 1.27)) (hide yes))
+    )
+    (property "ki_fp_filters" "LED*5050*"
+      (at 0 0 0)
+      (effects (font (size 1.27 1.27)) (hide yes))
+    )
+    (symbol "SK9822_0_1"
+      (rectangle
+        (start -7.62 7.62)
+        (end 7.62 -7.62)
+        (stroke (width 0.254) (type default))
+        (fill (type background))
+      )
+    )
+    (symbol "SK9822_1_1"
+      (pin input line
+        (at -10.16 2.54 0)
+        (length 2.54)
+        (name "SDI" (effects (font (size 1.27 1.27))))
+        (number "1" (effects (font (size 1.27 1.27))))
+      )
+      (pin input line
+        (at -10.16 -2.54 0)
+        (length 2.54)
+        (name "CKI" (effects (font (size 1.27 1.27))))
+        (number "2" (effects (font (size 1.27 1.27))))
+      )
+      (pin power_in line
+        (at 0 -10.16 90)
+        (length 2.54)
+        (name "GND" (effects (font (size 1.27 1.27))))
+        (number "3" (effects (font (size 1.27 1.27))))
+      )
+      (pin power_in line
+        (at 0 10.16 270)
+        (length 2.54)
+        (name "VCC" (effects (font (size 1.27 1.27))))
+        (number "4" (effects (font (size 1.27 1.27))))
+      )
+      (pin output line
+        (at 10.16 -2.54 180)
+        (length 2.54)
+        (name "CKO" (effects (font (size 1.27 1.27))))
+        (number "5" (effects (font (size 1.27 1.27))))
+      )
+      (pin output line
+        (at 10.16 2.54 180)
+        (length 2.54)
+        (name "SDO" (effects (font (size 1.27 1.27))))
+        (number "6" (effects (font (size 1.27 1.27))))
+      )
+    )
+    (embedded_fonts no)
+  )
+)
