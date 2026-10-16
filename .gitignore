@@ -76,3 +76,11 @@ Desktop.ini
 *.workspace # General workspace files, can be from various tools
 *.suo       # Visual Studio Solution User Options
 *.sln.docstates # Visual Studio
+*.lck
+ERC.rpt
+
+# KiCad scratch files
+.history/
+*-backups/
+fp-info-cache
+DRC.rpt
