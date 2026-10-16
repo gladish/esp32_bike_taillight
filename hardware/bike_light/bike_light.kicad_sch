@@ -215,6 +215,129 @@
 			)
 			(embedded_fonts no)
 		)
+		(symbol "Connector:TestPoint"
+			(pin_numbers
+				(hide yes)
+			)
+			(pin_names
+				(offset 0.762)
+				(hide yes)
+			)
+			(exclude_from_sim no)
+			(in_bom yes)
+			(on_board yes)
+			(in_pos_files yes)
+			(duplicate_pin_numbers_are_jumpers no)
+			(property "Reference" "TP"
+				(at 0 6.858 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Value" "TestPoint"
+				(at 0 5.08 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Footprint" ""
+				(at 5.08 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Datasheet" ""
+				(at 5.08 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Description" "test point"
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "ki_keywords" "test point tp"
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "ki_fp_filters" "Pin* Test*"
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(symbol "TestPoint_0_1"
+				(circle
+					(center 0 3.302)
+					(radius 0.762)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+			)
+			(symbol "TestPoint_1_1"
+				(pin passive line
+					(at 0 0 90)
+					(length 2.54)
+					(name "1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+			)
+			(embedded_fonts no)
+		)
 		(symbol "Connector:USB_C_Receptacle_USB2.0_16P"
 			(pin_names
 				(offset 1.016)
@@ -3286,6 +3409,18 @@
 		(uuid "678e40e9-84af-4c99-aea0-046f982e0335")
 	)
 	(rectangle
+		(start 306.07 193.04)
+		(end 397.51 238.76)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(fill
+			(type none)
+		)
+		(uuid "9471b254-7174-4672-82cd-bb60fd05bcd3")
+	)
+	(rectangle
 		(start 20.32 20.32)
 		(end 158.75 69.85)
 		(stroke
@@ -3350,6 +3485,16 @@
 			)
 		)
 		(uuid "59be206b-624b-4d43-ab9a-785e49f11f12")
+	)
+	(text "Recovery Test Pads"
+		(exclude_from_sim no)
+		(at 351.79 190.5 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+		(uuid "7626d1d1-b12e-44f7-9dae-000c32d26256")
 	)
 	(text "Battery & USB Sense"
 		(exclude_from_sim no)
@@ -3452,10 +3597,6 @@
 		(uuid "fed37056-599d-4b70-983e-f3d9c9bbc01e")
 	)
 	(no_connect
-		(at 106.68 217.17)
-		(uuid "083e4a4e-c387-4b5e-ab79-f3ecd5051b5e")
-	)
-	(no_connect
 		(at 76.2 219.71)
 		(uuid "392ab3c2-808f-4470-98f4-408a43789a25")
 	)
@@ -3466,10 +3607,6 @@
 	(no_connect
 		(at 201.93 229.87)
 		(uuid "8a88827d-3013-44cf-b10f-3a9d70041045")
-	)
-	(no_connect
-		(at 106.68 214.63)
-		(uuid "a4e6ad87-a2f0-49bd-a874-c831566c0607")
 	)
 	(no_connect
 		(at 257.81 119.38)
@@ -3542,6 +3679,16 @@
 			(type default)
 		)
 		(uuid "26fe245e-3990-4266-b025-026b00c52e9f")
+	)
+	(wire
+		(pts
+			(xy 381 228.6) (xy 386.08 228.6)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "2b52db67-3521-46df-907b-41a5b88bc9bb")
 	)
 	(wire
 		(pts
@@ -3755,6 +3902,16 @@
 	)
 	(wire
 		(pts
+			(xy 325.12 208.28) (xy 330.2 208.28)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "78d8f810-d5e3-4a62-be24-d8fc59ea8a54")
+	)
+	(wire
+		(pts
 			(xy 256.54 241.3) (xy 261.62 241.3)
 		)
 		(stroke
@@ -3772,6 +3929,16 @@
 			(type default)
 		)
 		(uuid "7d049230-cea9-403a-aa72-a1909645edc1")
+	)
+	(wire
+		(pts
+			(xy 347.98 228.6) (xy 358.14 228.6)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "7e75691f-eb08-4cb8-9354-a322f14eeb82")
 	)
 	(wire
 		(pts
@@ -3875,6 +4042,16 @@
 	)
 	(wire
 		(pts
+			(xy 375.92 208.28) (xy 386.08 208.28)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "95f288df-7d62-482a-9022-d2d3c9c12682")
+	)
+	(wire
+		(pts
 			(xy 93.98 119.38) (xy 101.6 119.38)
 		)
 		(stroke
@@ -3902,6 +4079,16 @@
 			(type default)
 		)
 		(uuid "9d4e1cd0-f1a5-4d82-9f63-349a3623e49e")
+	)
+	(wire
+		(pts
+			(xy 347.98 208.28) (xy 358.14 208.28)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "9f0db394-0358-406f-98af-032dda08f1ae")
 	)
 	(wire
 		(pts
@@ -4112,6 +4299,16 @@
 			(type default)
 		)
 		(uuid "cecb6df4-d7ea-4bcf-bea5-0c6b350024a5")
+	)
+	(wire
+		(pts
+			(xy 320.04 228.6) (xy 330.2 228.6)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "d268c0c2-0413-44d2-9204-c0b497609d62")
 	)
 	(wire
 		(pts
@@ -4483,6 +4680,46 @@
 		)
 		(uuid "3f9e66ea-76ac-4838-bf17-128cffe3a331")
 	)
+	(label "BOOT"
+		(at 66.04 242.57 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "47ac9083-8be8-4949-907f-1b5cc5029256")
+	)
+	(label "UART_TX"
+		(at 106.68 217.17 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "48c0ea9a-ad4c-4821-a4fd-7f3e1ffff99e")
+	)
+	(label "UART_TX"
+		(at 320.04 228.6 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "49c230d9-21ba-432c-8080-c622938d250c")
+	)
+	(label "ESP_EN"
+		(at 347.98 208.28 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "4d45c49f-8b4c-43ef-becb-af0c82e982f0")
+	)
 	(label "VBAT_SENSE"
 		(at 57.15 227.33 0)
 		(effects
@@ -4623,6 +4860,26 @@
 		)
 		(uuid "b4e61956-7bd1-42b7-8a2b-351f89b8687d")
 	)
+	(label "UART_RX"
+		(at 347.98 228.6 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "b58c7595-423b-461e-a4c7-e0ab52ca5c90")
+	)
+	(label "BOOT"
+		(at 375.92 208.28 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "bc4d1dbb-0f70-4778-9abf-a8fe75595fbb")
+	)
 	(label "USB_D+"
 		(at 57.15 250.19 0)
 		(effects
@@ -4642,6 +4899,16 @@
 			(justify right bottom)
 		)
 		(uuid "c12da94f-166f-49c6-87f2-3c907b6d3363")
+	)
+	(label "UART_RX"
+		(at 106.68 214.63 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "cbb6a897-6732-4949-a463-175955a984fc")
 	)
 	(label "LED_VDD"
 		(at 250.19 99.06 0)
@@ -5767,6 +6034,85 @@
 			(project "bike_light"
 				(path "/a24e7171-dcb9-45da-a514-9b29575ad727"
 					(reference "C11")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Connector:TestPoint")
+		(at 386.08 228.6 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom no)
+		(on_board yes)
+		(in_pos_files no)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "1cba1665-b212-479f-b922-41585f54a76f")
+		(property "Reference" "TP6"
+			(at 388.62 224.282 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Value" "GND"
+			(at 388.62 226.822 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" "TestPoint:TestPoint_Pad_D1.0mm"
+			(at 386.08 228.6 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 386.08 228.6 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" "test point"
+			(at 386.08 228.6 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "be18f1c1-27d9-4945-b47a-78249caeb790")
+		)
+		(instances
+			(project "bike_light"
+				(path "/a24e7171-dcb9-45da-a514-9b29575ad727"
+					(reference "TP6")
 					(unit 1)
 				)
 			)
@@ -7096,7 +7442,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" "bike_light:ESP32-C3-WROOM-02_NoVias"
+		(property "Footprint" "RF_Module:ESP32-C3-WROOM-02"
 			(at 91.44 231.775 0)
 			(hide yes)
 			(show_name no)
@@ -9069,7 +9415,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Connector_USB:USB_C_Receptacle_HRO_TYPE-C-31-M-12"
+		(property "Footprint" "bike_light:USB_C_Receptacle_HRO_TYPE-C-31-M-12"
 			(at 186.69 217.17 0)
 			(hide yes)
 			(show_name no)
@@ -10290,6 +10636,85 @@
 		)
 	)
 	(symbol
+		(lib_id "Connector:TestPoint")
+		(at 330.2 208.28 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom no)
+		(on_board yes)
+		(in_pos_files no)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "ac2aca33-d62a-4423-9894-f6fd185f79a8")
+		(property "Reference" "TP1"
+			(at 332.74 203.962 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Value" "3V3"
+			(at 332.74 206.502 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" "TestPoint:TestPoint_Pad_D1.0mm"
+			(at 330.2 208.28 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 330.2 208.28 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" "test point"
+			(at 330.2 208.28 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "bf7242f6-1767-4eb1-8f7e-54a8bf8ffe0e")
+		)
+		(instances
+			(project "bike_light"
+				(path "/a24e7171-dcb9-45da-a514-9b29575ad727"
+					(reference "TP1")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
 		(lib_id "power:GND")
 		(at 236.22 250.19 0)
 		(unit 1)
@@ -10845,6 +11270,85 @@
 			(project "bike_light"
 				(path "/a24e7171-dcb9-45da-a514-9b29575ad727"
 					(reference "#PWR050")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Connector:TestPoint")
+		(at 330.2 228.6 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom no)
+		(on_board yes)
+		(in_pos_files no)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "b4ce0109-ce06-4ab0-8b6f-b68023ebc625")
+		(property "Reference" "TP4"
+			(at 332.74 224.282 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Value" "TXD"
+			(at 332.74 226.822 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" "TestPoint:TestPoint_Pad_D1.0mm"
+			(at 330.2 228.6 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 330.2 228.6 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" "test point"
+			(at 330.2 228.6 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "e7770687-13b5-47ad-8d01-c79570472a46")
+		)
+		(instances
+			(project "bike_light"
+				(path "/a24e7171-dcb9-45da-a514-9b29575ad727"
+					(reference "TP4")
 					(unit 1)
 				)
 			)
@@ -11846,6 +12350,163 @@
 		)
 	)
 	(symbol
+		(lib_id "power:+3.3V")
+		(at 325.12 208.28 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "d743442f-f4d7-4d21-b559-01c003f8edfc")
+		(property "Reference" "#PWR063"
+			(at 325.12 212.09 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "+3.3V"
+			(at 325.12 204.47 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 325.12 208.28 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 325.12 208.28 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" "Power symbol creates a global label with name \"+3.3V\""
+			(at 325.12 208.28 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "4b713536-cb8a-46d8-b1ec-0e2be842fd90")
+		)
+		(instances
+			(project "bike_light"
+				(path "/a24e7171-dcb9-45da-a514-9b29575ad727"
+					(reference "#PWR063")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Connector:TestPoint")
+		(at 358.14 228.6 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom no)
+		(on_board yes)
+		(in_pos_files no)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "d745beb9-cfb7-4849-a30c-b3188f18a0c7")
+		(property "Reference" "TP5"
+			(at 360.68 224.282 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Value" "RXD"
+			(at 360.68 226.822 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" "TestPoint:TestPoint_Pad_D1.0mm"
+			(at 358.14 228.6 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 358.14 228.6 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" "test point"
+			(at 358.14 228.6 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "dde3e51c-a3b4-439f-8d64-71e0434089b4")
+		)
+		(instances
+			(project "bike_light"
+				(path "/a24e7171-dcb9-45da-a514-9b29575ad727"
+					(reference "TP5")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
 		(lib_id "power:GND")
 		(at 219.71 132.08 0)
 		(unit 1)
@@ -12405,6 +13066,85 @@
 		)
 	)
 	(symbol
+		(lib_id "Connector:TestPoint")
+		(at 386.08 208.28 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom no)
+		(on_board yes)
+		(in_pos_files no)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "e5a27019-6fd0-469a-9f9c-82ee7eef3d31")
+		(property "Reference" "TP3"
+			(at 388.62 203.962 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Value" "IO9_BOOT"
+			(at 388.62 206.502 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" "TestPoint:TestPoint_Pad_D1.0mm"
+			(at 386.08 208.28 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 386.08 208.28 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" "test point"
+			(at 386.08 208.28 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "e2dbda2a-b577-49e6-9d6b-630c7009bf29")
+		)
+		(instances
+			(project "bike_light"
+				(path "/a24e7171-dcb9-45da-a514-9b29575ad727"
+					(reference "TP3")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
 		(lib_id "Device:C")
 		(at 303.53 106.68 0)
 		(unit 1)
@@ -12723,6 +13463,85 @@
 			(project "bike_light"
 				(path "/a24e7171-dcb9-45da-a514-9b29575ad727"
 					(reference "#PWR058")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Connector:TestPoint")
+		(at 358.14 208.28 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom no)
+		(on_board yes)
+		(in_pos_files no)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "eb3ded28-ef03-46ee-82b6-5b42e4a3ed97")
+		(property "Reference" "TP2"
+			(at 360.68 203.962 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Value" "EN"
+			(at 360.68 206.502 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" "TestPoint:TestPoint_Pad_D1.0mm"
+			(at 358.14 208.28 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 358.14 208.28 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" "test point"
+			(at 358.14 208.28 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "3a3a0229-a526-4811-a5db-ff171b0f2507")
+		)
+		(instances
+			(project "bike_light"
+				(path "/a24e7171-dcb9-45da-a514-9b29575ad727"
+					(reference "TP2")
 					(unit 1)
 				)
 			)
@@ -13365,6 +14184,84 @@
 		)
 	)
 	(symbol
+		(lib_id "power:GND")
+		(at 381 228.6 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "f758e22f-2be2-496d-9f5c-74b466a16e22")
+		(property "Reference" "#PWR064"
+			(at 381 234.95 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "GND"
+			(at 381 232.41 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 381 228.6 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 381 228.6 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" "Power symbol creates a global label with name \"GND\" , ground"
+			(at 381 228.6 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "25ad4599-fa79-44d3-929d-d8175e01cf4c")
+		)
+		(instances
+			(project "bike_light"
+				(path "/a24e7171-dcb9-45da-a514-9b29575ad727"
+					(reference "#PWR064")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
 		(lib_id "Switch:SW_Push")
 		(at 224.79 36.83 0)
 		(unit 1)
@@ -13396,7 +14293,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Button_Switch_SMD:SW_Push_1P1T-MP_NO_Horizontal_Alps_SKRTLAE010"
+		(property "Footprint" "bike_light:SW_Push_1P1T-MP_NO_Horizontal_Alps_SKRTLAE010"
 			(at 224.79 31.75 0)
 			(hide yes)
 			(show_name no)
@@ -13835,11 +14732,11 @@
 	)
 	(group ""
 		(uuid "260958e8-e74b-48dc-bca4-f2cb313598bd")
-		(members "034e7e92-0e0f-4177-a023-3b1277c2b9bd" "237cb28e-85ef-40bf-80c6-8b39a80c64c5"
-			"2c42c3cf-afc9-47fb-8774-a9d40c9d16c2" "7ffe078b-ee1b-4cf6-a5d8-3e0faae32acb"
-			"8154fed9-dcd8-47fd-a8d9-bd12c222560d" "88701715-71cc-438b-8c2f-f24f3ac6f629"
-			"932fadab-261d-473a-8691-61e443871431" "d4db452f-1738-4cb0-a876-94f0a026e450"
-			"e30ee5b7-90aa-4e5c-ab2f-a93ac65154d2" "fe05a0e5-1843-4be6-851e-dfabbddfa2c7"
+		(members "034e7e92-0e0f-4177-a023-3b1277c2b9bd" "2c42c3cf-afc9-47fb-8774-a9d40c9d16c2"
+			"7ffe078b-ee1b-4cf6-a5d8-3e0faae32acb" "8154fed9-dcd8-47fd-a8d9-bd12c222560d"
+			"88701715-71cc-438b-8c2f-f24f3ac6f629" "932fadab-261d-473a-8691-61e443871431"
+			"d4db452f-1738-4cb0-a876-94f0a026e450" "e30ee5b7-90aa-4e5c-ab2f-a93ac65154d2"
+			"fe05a0e5-1843-4be6-851e-dfabbddfa2c7"
 		)
 	)
 	(group ""
@@ -13848,7 +14745,7 @@
 			"65ea0393-497c-4df5-9b03-824210ae071b" "814217ff-d55d-40b5-93b0-e6e134b5d417"
 			"884cb06c-12b6-480e-b5e0-91afc1a5171a" "916ce09b-2d36-42d7-b74e-aa166c991f88"
 			"b942f59c-f19a-4e96-bf49-e1bba7accc13" "c610eabc-7e56-4bc2-b833-89ee784660da"
-			"e01d1548-3eef-4d82-9dd7-5565032fa20d" "f019e1e6-661c-4b2c-b727-66c447723be9"
+			"e01d1548-3eef-4d82-9dd7-5565032fa20d"
 		)
 	)
 	(group ""
@@ -13856,19 +14753,18 @@
 		(members "0a101523-0068-4948-bbe3-29ef88a2a392" "377e585a-5f19-4993-9568-4b94a6ce5f4d"
 			"4ceb066d-eb61-436c-a79d-1ac538ab0133" "6bca5eb4-9cfa-40af-b71a-c87f1b999903"
 			"6ec0a6d3-2925-47da-99fa-c8fffbd5e6a0" "78e01271-f5c1-42ca-a6ba-ae74fd272ea1"
-			"89dfbafa-7664-4f5b-b469-10710ab501cb" "999d4fed-f43c-4d9f-ad0d-d87bf4dfb005"
-			"fbe486a3-4cdb-4ed4-95bc-b38daf68cff9" "fcc455fd-80a0-4424-866b-d7766e5419c4"
+			"999d4fed-f43c-4d9f-ad0d-d87bf4dfb005" "fbe486a3-4cdb-4ed4-95bc-b38daf68cff9"
+			"fcc455fd-80a0-4424-866b-d7766e5419c4"
 		)
 	)
 	(group ""
 		(uuid "77dbfde6-1ff3-49ce-8cc3-1ceedce750f3")
 		(members "02dbc627-618c-49b7-9781-460a66f7b05b" "12be253f-c830-424f-94bd-66d6c6664e76"
-			"2f347dc8-d92c-4fa7-a631-5b19e8624d64" "37707458-8f4f-4a17-87a0-b4131289459c"
-			"74780a8d-c367-4d04-81b4-11ec2b877bda" "9b742725-e640-4a04-a87b-5cab894bb4b7"
-			"a104bd9a-97b5-4d43-b011-53886e54e5b0" "b63474a8-7054-436c-9407-686f1701d8d7"
-			"e2887aa6-a5b7-474c-ad97-fb33eda250bd" "e473e994-b0d0-40e0-84cf-949b06a84207"
-			"e71c71c3-fc35-4b3c-ac31-9d7604ac9500" "ea3943d1-0a8a-411a-b17b-85e4ae04d981"
-			"f5d26485-c4c8-4cca-b15a-aa0314027bc9"
+			"37707458-8f4f-4a17-87a0-b4131289459c" "74780a8d-c367-4d04-81b4-11ec2b877bda"
+			"9b742725-e640-4a04-a87b-5cab894bb4b7" "a104bd9a-97b5-4d43-b011-53886e54e5b0"
+			"b63474a8-7054-436c-9407-686f1701d8d7" "e2887aa6-a5b7-474c-ad97-fb33eda250bd"
+			"e473e994-b0d0-40e0-84cf-949b06a84207" "e71c71c3-fc35-4b3c-ac31-9d7604ac9500"
+			"ea3943d1-0a8a-411a-b17b-85e4ae04d981" "f5d26485-c4c8-4cca-b15a-aa0314027bc9"
 		)
 	)
 	(group ""
@@ -13877,25 +14773,25 @@
 			"203d8a78-894f-4083-8d23-f3c5a706d9a9" "3b0cd983-1f85-4c7c-bbe6-7b63f91e97d3"
 			"57db8e06-a688-4cbd-be3c-870709ec9a17" "be03c661-256d-4c63-82a7-3a620b955acb"
 			"cff012a0-9377-4647-977e-2b9f3d7ba35c" "d9b6e894-e7cb-47b5-b0cc-8d348ac5ead5"
-			"da209097-2fcd-4348-8701-23734e9dc5a4" "f85270b9-0ca8-477d-a92b-21d6ceca3c67"
+			"f85270b9-0ca8-477d-a92b-21d6ceca3c67"
 		)
 	)
 	(group ""
 		(uuid "9bd1fc88-dffd-4cb2-8bcc-975d4e3cd4ed")
 		(members "365749aa-e15e-4d9a-ae30-7e13b09d3af8" "49981860-d26a-4539-a9b6-1e9a2054c09e"
 			"66c43663-525e-49cf-8488-7053ff1df5bd" "85035c4f-514d-41f1-ae3f-32982338fbeb"
-			"8cb27fcc-4e2b-40ab-b95e-9a4b6a959be0" "9b262181-90f0-4708-bf05-5b6aecb6144e"
-			"c1aa60b8-6f5b-45e8-a237-fc4e248e19b8" "e0628b21-75a8-471e-8f59-00e4e763af2f"
-			"e47d6199-7abe-4112-b010-2bb9f430997d" "f3d79ddd-6eff-42cb-a876-e090ca9bb362"
+			"9b262181-90f0-4708-bf05-5b6aecb6144e" "c1aa60b8-6f5b-45e8-a237-fc4e248e19b8"
+			"e0628b21-75a8-471e-8f59-00e4e763af2f" "e47d6199-7abe-4112-b010-2bb9f430997d"
+			"f3d79ddd-6eff-42cb-a876-e090ca9bb362"
 		)
 	)
 	(group ""
 		(uuid "b49fb72b-e97a-47c8-975b-231009fec797")
 		(members "22cf1190-f203-4a1e-bb30-2488af85077f" "399db8bf-9109-402e-8347-8a7257ad6229"
 			"3f9deddd-2495-40fd-8654-0da13224761b" "4b460d8d-e620-4501-a46a-b8482298938a"
-			"88a00270-9a1f-4ba1-95ee-8d83d3d874b4" "95bdfa8b-352e-4e5c-a310-067778807c6d"
-			"b134609c-f9bb-4acd-9bf5-9534ad02a440" "b3967a07-ff3f-4712-af11-e915c00c1b72"
-			"c1e7aef0-94d5-4e37-8b26-4a672e153855" "e97172d9-2edb-460a-a44d-f014fa19c9ae"
+			"88a00270-9a1f-4ba1-95ee-8d83d3d874b4" "b134609c-f9bb-4acd-9bf5-9534ad02a440"
+			"b3967a07-ff3f-4712-af11-e915c00c1b72" "c1e7aef0-94d5-4e37-8b26-4a672e153855"
+			"e97172d9-2edb-460a-a44d-f014fa19c9ae"
 		)
 	)
 	(group ""
@@ -13904,7 +14800,7 @@
 			"7d049230-cea9-403a-aa72-a1909645edc1" "ae4ac089-0945-4b8a-a8d6-14dbbf89b670"
 			"b049c8d5-f22c-4850-8fb7-bb55966094f6" "b1a30881-1b35-4a5b-b80e-853ce5f749e3"
 			"b4e61956-7bd1-42b7-8a2b-351f89b8687d" "e69a0459-24bb-4f38-9bdb-44fc4336b5d8"
-			"e86478aa-fe26-42c5-a8c3-758738c54f27" "f081b8ba-37d8-4204-8d36-ead9bc36f8ac"
+			"e86478aa-fe26-42c5-a8c3-758738c54f27"
 		)
 	)
 	(sheet_instances
