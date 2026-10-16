@@ -215,6 +215,7 @@
 		(size 0.6 1.45)
 		(layers "F.Cu" "F.Mask" "F.Paste")
 		(roundrect_rratio 0.25)
+		(zone_connect 2)
 		(uuid "245fae56-8b58-4bd8-bbf1-36624dc3fa3e")
 	)
 	(pad "A4" smd roundrect
@@ -264,6 +265,7 @@
 		(size 0.6 1.45)
 		(layers "F.Cu" "F.Mask" "F.Paste")
 		(roundrect_rratio 0.25)
+		(zone_connect 2)
 		(uuid "3795b0f1-50f9-473e-9d26-381fc08b3c2d")
 	)
 	(pad "B1" smd roundrect
@@ -271,6 +273,7 @@
 		(size 0.6 1.45)
 		(layers "F.Cu" "F.Mask" "F.Paste")
 		(roundrect_rratio 0.25)
+		(zone_connect 2)
 		(uuid "c9e8a0db-2a60-41d9-b783-6c4e64a8fb5d")
 	)
 	(pad "B4" smd roundrect
@@ -320,6 +323,7 @@
 		(size 0.6 1.45)
 		(layers "F.Cu" "F.Mask" "F.Paste")
 		(roundrect_rratio 0.25)
+		(zone_connect 2)
 		(uuid "eda87c04-3a59-4e2c-a9bd-f59ed31672aa")
 	)
 	(pad "SH" thru_hole oval
