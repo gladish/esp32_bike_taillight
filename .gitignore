@@ -84,3 +84,7 @@ ERC.rpt
 *-backups/
 fp-info-cache
 DRC.rpt
+*.dsn
+*.ses
+*.rules
+
