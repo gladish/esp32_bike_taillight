@@ -545,7 +545,7 @@
       "idf": "",
       "netlist": "",
       "plot": "",
-      "specctra_dsn": "",
+      "specctra_dsn": "bike_light.dsn",
       "vrml": ""
     },
     "page_layout_descr_file": ""
